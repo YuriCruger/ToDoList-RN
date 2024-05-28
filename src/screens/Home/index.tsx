@@ -1,4 +1,12 @@
-import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  FlatList,
+  Image,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { styles } from "./style";
 import { TaskItem } from "../../components/TaskItem";
 import { CountNumber } from "../../components/CountNumber";
@@ -11,6 +19,12 @@ export default function Home() {
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
 
   function handleAddTask() {
+    if (tasks.includes(taskContent)) {
+      return Alert.alert(
+        "Tarefa já existente",
+        "Já existe uma tarefa na lista com esse nome."
+      );
+    }
     setTasks((prevState) => [taskContent, ...prevState]);
     setTaskContent("");
   }
@@ -63,27 +77,31 @@ export default function Home() {
           </View>
         </View>
 
-        {tasks.map((task) => (
-          <TaskItem
-            key={task}
-            taskContent={task}
-            handleDeleteTask={handleDeleteTask}
-            handleToggleTaskComplete={handleToggleTaskComplete}
-            isTaskConcluded={completedTasks.includes(task)}
-          />
-        ))}
-
-        {tasks.length === 0 && (
-          <View style={styles.emptyContainer}>
-            <Icon name="clipboard" size={50} color="gray" />
-            <Text style={styles.emptyTextBold}>
-              Você ainda não tem tarefas cadastradas.
-            </Text>
-            <Text style={styles.emptyText}>
-              Crie tarefas e organize seus itens a fazer.
-            </Text>
-          </View>
-        )}
+        <FlatList
+          data={tasks}
+          keyExtractor={(item) => item}
+          renderItem={({ item }) => (
+            <TaskItem
+              key={item}
+              taskContent={item}
+              handleDeleteTask={handleDeleteTask}
+              handleToggleTaskComplete={handleToggleTaskComplete}
+              isTaskConcluded={completedTasks.includes(item)}
+            />
+          )}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={() => (
+            <View style={styles.emptyContainer}>
+              <Icon name="clipboard" size={50} color="gray" />
+              <Text style={styles.emptyTextBold}>
+                Você ainda não tem tarefas cadastradas.
+              </Text>
+              <Text style={styles.emptyText}>
+                Crie tarefas e organize seus itens a fazer.
+              </Text>
+            </View>
+          )}
+        />
       </View>
     </>
   );
